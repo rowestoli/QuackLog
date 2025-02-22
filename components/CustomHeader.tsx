@@ -1,13 +1,12 @@
 // app/components/CustomHeader.tsx
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { useRouter, usePathname } from 'expo-router';
+import { usePathname } from 'expo-router'; // We remove useRouter since no navigation route is needed for sign out
 import { signOut } from 'firebase/auth';
 import { auth } from '../config/firebaseConfig';
 
 export default function CustomHeader() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const router = useRouter();
   const pathname = usePathname();
 
   // Hide the profile dropdown when the route changes
@@ -23,10 +22,9 @@ export default function CustomHeader() {
     try {
       console.log("Attempting to sign out...");
       await signOut(auth);
-      console.log("Sign out successful. Resetting navigation to /signin...");
+      console.log("Sign out successful. No route navigation needed (modal approach).");
       setShowProfileDropdown(false);
-      // Clear navigation history and navigate to the Sign In screen
-      router.resetRoot({ pathname: '/signin' });
+      // No router call here. The RootLayout sees auth.currentUser == null => shows SignInForm
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -40,7 +38,7 @@ export default function CustomHeader() {
           <Image source={require('../assets/images/gearicon.png')} style={styles.headerIcon} />
         </TouchableOpacity>
         {/* Center: App Title */}
-        <Text style={styles.headerTitle}>Duck Hunting App</Text>
+        <Text style={styles.headerTitle}>QuackLog</Text>
         {/* Right: Profile Icon */}
         <TouchableOpacity style={styles.iconButton} onPress={handleProfilePress}>
           <Image source={require('../assets/images/profileicon.png')} style={styles.headerIcon} />
@@ -70,7 +68,7 @@ const styles = StyleSheet.create({
   },
   iconButton: { padding: 8 },
   headerIcon: { width: 24, height: 24, resizeMode: 'contain' },
-  headerTitle: { fontSize: 16, fontWeight: 'bold' },
+  headerTitle: { fontSize: 25, fontWeight: 'bold' },
   dropdownContainer: {
     backgroundColor: '#fff',
     borderWidth: 1,

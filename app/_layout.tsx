@@ -1,11 +1,11 @@
 // app/layout.tsx
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, StyleSheet, Image, Modal } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Image } from 'react-native';
 import { Tabs } from 'expo-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../config/firebaseConfig';
 import CustomHeader from '../components/CustomHeader';
-import SignInForm from '../components/SignInForm';
+import AuthForm from '../components/AuthForm';
 
 export default function RootLayout() {
   const [initializing, setInitializing] = useState(true);
@@ -27,10 +27,17 @@ export default function RootLayout() {
     );
   }
 
+  // If there's no authenticated user, show the SignInForm (fullscreen).
+  if (!user) {
+    return <AuthForm />;
+  }
+
+  // Otherwise, user is authenticated -> show the main app layout.
   return (
     <View style={styles.container}>
       <CustomHeader />
       <Tabs
+        initialRouteName="logs"
         screenOptions={({ route }) => ({
           headerShown: false,
           tabBarIcon: ({ color, size }) => {
@@ -73,12 +80,6 @@ export default function RootLayout() {
         <Tabs.Screen name="logs" options={{ title: 'Logs' }} />
         <Tabs.Screen name="weather" options={{ title: 'Weather' }} />
       </Tabs>
-      {/* Sign In Modal: If no user is signed in, display the modal */}
-      {!user && (
-        <Modal visible={true} animationType="slide" transparent={false}>
-          <SignInForm />
-        </Modal>
-      )}
     </View>
   );
 }
